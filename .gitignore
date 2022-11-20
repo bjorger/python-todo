@@ -1,4 +1,3 @@
 node_modules
-.serverless-wsgi
-wsgi_handler.py
+**/__pycache__/
 serverless_wsgi.py
