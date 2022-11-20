@@ -1,4 +1,4 @@
 node_modules
-./.serverless-wsgi
-./wsgi_handler.py
-./serverless_wsgi.py
+.serverless-wsgi
+wsgi_handler.py
+serverless_wsgi.py
