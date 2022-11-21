@@ -3,7 +3,7 @@ from api.schema.todo import TodoSchema
 from typing import List
 
 import uuid
-import json
+
 class TodoService: 
     Model: TodoModel
     def __init__(self) -> None:
