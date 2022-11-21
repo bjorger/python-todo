@@ -3,17 +3,12 @@ from api.model.todo import TodoModel
 from api.service.todo import TodoService
 from api.schema.todo import TodoSchema
 from dotenv import load_dotenv
+
 import json
 
 load_dotenv()
 
-def create_app(configfile) -> Flask:
-    app = Flask(__name__)
-    app.config.from_pyfile(configfile)
-    
-    return app
-
-app = create_app('./config.py')
+app = Flask(__name__)
 
 URL_PREFIX='/v1/todo'
 
