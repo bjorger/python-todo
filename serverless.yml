@@ -34,7 +34,7 @@ functions:
 custom:
     tableName: "TODO_TABLE"
     wsgi:
-        app: app.app
+        app: ./api/main.app
         packRequirements: false
 
 plugins:
