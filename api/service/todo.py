@@ -1,62 +1,67 @@
-import boto3 
 from api.model.todo import TodoModel
 from api.schema.todo import TodoSchema
 from typing import List
 
-class TodoService:  
+import uuid
+import json
+class TodoService: 
+    Model: TodoModel
     def __init__(self) -> None:
         if not TodoModel.exists():
             print("Table does not exist")
             TodoModel.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
         
+        
     def get_item(self, id) -> TodoModel:
-        result = self.table.get_item(Key={'id': {'S': id}})
-        item = result.get('Item')
-        if not item:
-            raise Exception('No item with id: {} found'.format(id))
-
-        return item
+        try:
+            item = TodoModel.get(id)
+            return item
+        except:
+            raise Exception('Could not find item with provided id: {}'.format(id))
     
     def get_items(self) -> List[TodoModel]:
         try:
-            print("Scanning Table for items")
-            items = self.table.scan()
-        
-            if not items:
-                return []
+            items = TodoModel.scan()
+            list = []
             
-            return items
+            for item in items:
+                list.append({
+                    "id": item.id,
+                    "title": item.title,
+                    "description": item.description
+                })
+            
+            return list
         except:
             print('Something went wrong while scanning table: {}'.format(self.tableName))
             
-    def create_item(self, item: TodoSchema) -> str:
-        print(item.title)
-        print(item.description)
-        todo = TodoModel(item.title, item.description)
-        print(todo)
-        return ""
-        """
-        print(todo)
+    def create_item(self, item: TodoSchema) -> None:
         try:
-            print("Hallo")
-            todo = TodoModel(item.title, item.description)
-            print(todo)
+            id = str(uuid.uuid4())
+            todo = TodoModel(id=id, title=item.title, description=item.description)
             todo.save()
-        
-        """
-        """
-            uuid = str(uuid.uuid4())
-            self.table.put_item(
-                Item={
-                    id: uuid,
-                    'title': item.title,
-                    'description': item.description
-                }
-            )
-        """
-        """
-            return 0
+            print("Successfully created item with ID: {}".format(id))
         except:
             raise Exception('Error while creating Todo Item')
-        """
         
+    def update_item(self, id: str, title: str, description: str) -> TodoModel:
+        try:
+            item = TodoModel.get(id)
+
+            item.update(
+                actions=[
+                    TodoModel.title.set(title),
+                    TodoModel.description.set(description)
+                ]
+            )
+        
+            return item
+        except:
+            raise Exception('Could not find item with provided id: {}'.format(id))
+
+    def delete_item(self, id: str) -> TodoModel:
+        try:
+            item = TodoModel.get(id)
+            item.delete()
+        except:
+            raise Exception('Could not delete item with provided id: {}'.format(id))
