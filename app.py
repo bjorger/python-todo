@@ -1,8 +1,13 @@
 from flask import Flask, jsonify, make_response, request, Blueprint
 from api.model.todo import TodoModel
-from api.schema.todo import TodoSchema
 from api.service.todo import TodoService
+from api.schema.todo import TodoSchema
+from dotenv import load_dotenv
+
+import os
 import json
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -27,12 +32,16 @@ def get_item(id) -> TodoModel:
     except:
         return jsonify({'error': 'Could not find item with provided id: {}'.format(id)}), 404
 
-@app.route('{}/'.format(URL_PREFIX), methods=['PUT'])
+@app.route('{}/'.format(URL_PREFIX), methods=['POST'])
 def create_item():
-    data = request.get_json()
-    print(data)
-    
-    return jsonify()
+    try:
+        data = request.get_json()
+        item = TodoSchema(data['title'], data['description'])
+        service.create_item(item)
+
+        return jsonify({'message': 'success'}), 200
+    except:
+        return jsonify({'error': 'There was an error while creating the To-Do object.'}), 400
     """
     item = Todo
     user_id = request.json.get('userId')

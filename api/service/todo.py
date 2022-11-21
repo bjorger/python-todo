@@ -3,14 +3,11 @@ from api.model.todo import TodoModel
 from api.schema.todo import TodoSchema
 from typing import List
 
-class TodoService:
-    table: any
-    tableName = 'TODO_TABLE'
-    
+class TodoService:  
     def __init__(self) -> None:
-        print("Initializing Todo Service")
-        self.table = boto3.resource('dynamodb').Table('TODO_TABLE')
-        print("Successfully initialized Todo Service")
+        if not TodoModel.exists():
+            print("Table does not exist")
+            TodoModel.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
         
     def get_item(self, id) -> TodoModel:
         result = self.table.get_item(Key={'id': {'S': id}})
@@ -33,7 +30,21 @@ class TodoService:
             print('Something went wrong while scanning table: {}'.format(self.tableName))
             
     def create_item(self, item: TodoSchema) -> str:
+        print(item.title)
+        print(item.description)
+        todo = TodoModel(item.title, item.description)
+        print(todo)
+        return ""
+        """
+        print(todo)
         try:
+            print("Hallo")
+            todo = TodoModel(item.title, item.description)
+            print(todo)
+            todo.save()
+        
+        """
+        """
             uuid = str(uuid.uuid4())
             self.table.put_item(
                 Item={
@@ -42,7 +53,10 @@ class TodoService:
                     'description': item.description
                 }
             )
-            
-            return uuid
+        """
+        """
+            return 0
         except:
             raise Exception('Error while creating Todo Item')
+        """
+        
